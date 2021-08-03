@@ -21,7 +21,7 @@ const generateItems=(items)=>{
     let itemsHTML=""
     items.forEach((item)=>{
         itemsHTML+=`
-        <div class="main-product mx-2 ">
+        <div class="main-product mr-5 ">
         <div class="product-image w-48 h-52 bg-white rounded-lg p-4">
              <img class="w-full h-full object-contain" src="${item.image}" alt="">
         </div>
