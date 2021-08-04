@@ -9,10 +9,21 @@ db.collection("cart-items").onSnapshot((snapshot) => {
         })
     })
     generateCartItems(cartItems)
-    
+    getTotalCost(cartItems)
 })
 
 }
+const getTotalCost=(items)=>{
+    let totalCost=0;
+    items.forEach((item)=>{
+        totalCost += (item.price * item.quantity);
+    })
+    document.querySelector(".total-cost-number").innerText=
+    ` $ ${totalCost}`
+    
+
+}
+
  const decreaseCount=(itemId)=>{
      let cartItem=db.collection("cart-items").doc(itemId)
      cartItem.get().then(function(doc){
