@@ -13,8 +13,41 @@ db.collection("cart-items").onSnapshot((snapshot) => {
 })
 
 }
+ const decreaseCount=(itemId)=>{
+     let cartItem=db.collection("cart-items").doc(itemId)
+     cartItem.get().then(function(doc){
+         if(doc.exists){
+             if(doc.data().quantity>1){
+                cartItem.update({
+                    quantity:doc.data().quantity-1 
+                })
+             }
+             else{
+                 deleteItem(itemId)
+             }
+           
+         }
+     })
+ }
 
-const generateCartItems=(cartItems)=>{
+ const increaseCount=(itemId)=>{
+    let cartItem=db.collection("cart-items").doc(itemId)
+    cartItem.get().then(function(doc){
+        if(doc.exists){
+            if(doc.data().quantity>0){
+               cartItem.update({
+                   quantity:doc.data().quantity+1 
+               })
+            }
+          
+        }
+    })
+}
+const deleteItem=(itemId)=>{
+    db.collection("cart-items").doc(itemId).delete();
+} 
+
+ const generateCartItems=(cartItems)=>{
 let itemsHTML='';
 cartItems.forEach((item)=>{
     itemsHTML += `
@@ -29,18 +62,18 @@ cartItems.forEach((item)=>{
                   
                 </div>
                 <div class="cart-item-counter w-48 flex items-center">
-                    <div  class="cart-item-decrease text-gray-400 bg-gray-100 rounded h-6 w-6 flex justify-center items-center hover:bg-gray-200 mr-2 cursor-pointer">
+                    <div data-id="${item.id}" class="cart-item-decrease text-gray-400 bg-gray-100 rounded h-6 w-6 flex justify-center items-center hover:bg-gray-200 mr-2 cursor-pointer">
                         <i class="fas fa-chevron-left fa-xs"></i>
                     </div>
                     <h4 class="text-gray-400">x ${item.quantity}</h4>
-                    <div  class="cart-item-increase text-gray-400 bg-gray-100 rounded h-6 w-6 flex justify-center items-center hover:bg-gray-200 ml-2 cursor-pointer">                                
+                    <div data-id="${item.id}" class="cart-item-increase text-gray-400 bg-gray-100 rounded h-6 w-6 flex justify-center items-center hover:bg-gray-200 ml-2 cursor-pointer">                                
                         <i class="fas fa-chevron-right fa-xs"></i>
                     </div>
                 </div>
                 <div class="cart-item-total-cost w-48 font-bold text-gray-400">
                     ${item.price * item.quantity}
                 </div>
-                <div   class="cart-item-delete w-10 font-bold text-gray-300 cursor-pointer hover:text-gray-400">
+                <div  data-id="${item.id}"  class="cart-item-delete w-10 font-bold text-gray-300 cursor-pointer hover:text-gray-400">
                     <i class="fas fa-times"></i>
                 </div>
             </div>
@@ -50,6 +83,31 @@ cartItems.forEach((item)=>{
 
 })
 document.querySelector(".cart-items").innerHTML=itemsHTML
-
+createEventListeners()
 }
+const createEventListeners=()=>{
+let decreaseButtons=document.querySelectorAll(".cart-item-decrease")
+let increaseButtons=document.querySelectorAll(".cart-item-increase")
+let deleteButtons=document.querySelectorAll(".cart-item-delete")
+deleteButtons.forEach((btn_del)=>{
+    btn_del.addEventListener("click",function(){
+        deleteItem(btn_del.dataset.id)
+    })
+})
+decreaseButtons.forEach((button)=>{
+    button.addEventListener("click",function(){
+       decreaseCount(button.dataset.id)
+    })
+    
+})
+increaseButtons.forEach((btn)=>{
+   btn.addEventListener("click",function(){
+       increaseCount(btn.dataset.id)
+     })
+})
+}
+
+
+
+
 getItemsCart()
